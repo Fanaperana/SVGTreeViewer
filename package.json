@@ -9,6 +9,8 @@
   ],
   "scripts": {
     "build": "tsc --build tsconfig.json",
+    "build:modern": "tsc -p tsconfig.json",
+    "build:legacy": "tsc -p tsconfig.legacy.json",
     "dev": "tsc -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
