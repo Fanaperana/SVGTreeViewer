@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG Tree Viewer - Legacy Browser Support</title>
+    <style>
+        #tree-container {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div id="tree-container"></div>
+    
+    <!-- Polyfills for older browsers -->
+    <script src="https://cdn.jsdelivr.net/npm/core-js@3.30.2/minified.js"></script>
+    
+    <!-- Your bundled JavaScript -->
+    <script src="dist/browser/bundle.js"></script>
+    
+    <!-- Initialize the tree viewer -->
+    <script>
+        // Example data
+        const treeData = [
+            { id: 1, parent_id: null, text: "Root Node" },
+            { id: 2, parent_id: 1, text: "Child 1" },
+            { id: 3, parent_id: 1, text: "Child 2" },
+            { id: 4, parent_id: 2, text: "Grandchild 1" },
+            { id: 5, parent_id: 2, text: "Grandchild 2" }
+        ];
+        
+        // Initialize the tree viewer
+        document.addEventListener('DOMContentLoaded', function() {
+            const treeViewer = new SVGTreeViewer({
+                containerId: 'tree-container',
+                data: treeData,
+                collapseChild: true
+            });
+        });
+    </script>
+</body>
+</html>
