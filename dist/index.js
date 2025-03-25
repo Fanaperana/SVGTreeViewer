@@ -11,7 +11,10 @@ class SVGTreeViewer {
         this.dragStartY = 0;
         // Store the dimensions of the entire tree for centering
         this.treeBounds = {
-            minX: 0, minY: 0, maxX: 0, maxY: 0
+            minX: 0,
+            minY: 0,
+            maxX: 0,
+            maxY: 0,
         };
         this.options = {
             containerId: options.containerId,
@@ -25,9 +28,9 @@ class SVGTreeViewer {
             nodePadding: options.nodePadding || 40,
             levelHeight: options.levelHeight || 150,
             horizontalSpacing: options.horizontalSpacing || 200,
-            backgroundPattern: options.backgroundPattern || 'dots',
-            backgroundColor: options.backgroundColor || '#f9f9f9',
-            patternColor: options.patternColor || '#cccccc'
+            backgroundPattern: options.backgroundPattern || "dots",
+            backgroundColor: options.backgroundColor || "#f9f9f9",
+            patternColor: options.patternColor || "#cccccc",
         };
         this.nodes = this._buildTree();
         this.scale = 1;
@@ -96,13 +99,13 @@ class SVGTreeViewer {
      * @param svg The SVG element to apply the pattern to
      */
     _applyBackgroundPattern(svg) {
-        if (this.options.backgroundPattern === 'none') {
+        if (this.options.backgroundPattern === "none") {
             return;
         }
         let defs;
         let patternId;
         // Create the pattern based on the option
-        if (this.options.backgroundPattern === 'dots') {
+        if (this.options.backgroundPattern === "dots") {
             defs = this._createDotPattern();
             patternId = "dotPattern";
         }
@@ -121,10 +124,10 @@ class SVGTreeViewer {
     _buildTree() {
         const map = new Map();
         const { idAlias, parentIdAlias, data } = this.options;
-        const flat = data.map(d => (Object.assign(Object.assign({}, d), { id: d[idAlias], parent_id: d[parentIdAlias], children: [], collapsed: false, data: d, manuallyPositioned: false })));
-        flat.forEach(n => map.set(n.id, n));
+        const flat = data.map((d) => (Object.assign(Object.assign({}, d), { id: d[idAlias], parent_id: d[parentIdAlias], children: [], collapsed: false, data: d, manuallyPositioned: false })));
+        flat.forEach((n) => map.set(n.id, n));
         const roots = [];
-        flat.forEach(n => {
+        flat.forEach((n) => {
             if (n.parent_id == null) {
                 roots.push(n);
             }
@@ -145,36 +148,36 @@ class SVGTreeViewer {
         const resetBtn = document.createElement("button");
         const centerBtn = document.createElement("button");
         zoomeInBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zoom-in"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="11" x2="11" y1="8" y2="14"/><line x1="8" x2="14" y1="11" y2="11"/></svg>`; // Plus
-        zoomOutBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zoom-out"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="8" x2="14" y1="11" y2="11"/></svg>`; // Minus  
-        resetBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-cw"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>`; // Reset 
-        centerBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-maximize"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>`; // center   
+        zoomOutBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zoom-out"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="8" x2="14" y1="11" y2="11"/></svg>`; // Minus
+        resetBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-cw"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>`; // Reset
+        centerBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-maximize"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>`; // center
         zoomeInBtn.title = "Zoom in";
         zoomOutBtn.title = "Zoom out";
         resetBtn.title = "Reset view";
         centerBtn.title = "Center tree";
         zoomeInBtn.onmouseenter = () => {
-            zoomeInBtn.style.opacity = '0.9';
+            zoomeInBtn.style.opacity = "0.9";
         };
         zoomeInBtn.onmouseleave = () => {
-            zoomeInBtn.style.opacity = '.3';
+            zoomeInBtn.style.opacity = ".3";
         };
         zoomOutBtn.onmouseenter = () => {
-            zoomOutBtn.style.opacity = '0.9';
+            zoomOutBtn.style.opacity = "0.9";
         };
         zoomOutBtn.onmouseleave = () => {
-            zoomOutBtn.style.opacity = '.3';
+            zoomOutBtn.style.opacity = ".3";
         };
         resetBtn.onmouseenter = () => {
-            resetBtn.style.opacity = '0.9';
+            resetBtn.style.opacity = "0.9";
         };
         resetBtn.onmouseleave = () => {
-            resetBtn.style.opacity = '.3';
+            resetBtn.style.opacity = ".3";
         };
         centerBtn.onmouseenter = () => {
-            centerBtn.style.opacity = '0.9';
+            centerBtn.style.opacity = "0.9";
         };
         centerBtn.onmouseleave = () => {
-            centerBtn.style.opacity = '.3';
+            centerBtn.style.opacity = ".3";
         };
         zoomeInBtn.style.cssText = `
             margin: 4px;
@@ -239,7 +242,7 @@ class SVGTreeViewer {
             this.centerTree();
         };
         const btn_wrapper = document.createElement("div");
-        wrapper.style.position = 'relative';
+        wrapper.style.position = "relative";
         // wrapper.onmouseenter = () => {
         //     btn_wrapper.style.opacity = '0.5';
         // }
@@ -285,7 +288,7 @@ class SVGTreeViewer {
         this.svg = svg;
     }
     _attachEvents() {
-        this.svg.addEventListener('mousedown', (e) => {
+        this.svg.addEventListener("mousedown", (e) => {
             const target = e.target;
             // Skip if we're clicking a collapse button or a drag handle
             if (target.closest(".collapse-btn") || target.closest(".drag-handle"))
@@ -294,12 +297,13 @@ class SVGTreeViewer {
             this.startX = e.clientX - this.panX;
             this.startY = e.clientY - this.panY;
         });
-        this.svg.addEventListener('mousemove', (e) => {
+        this.svg.addEventListener("mousemove", (e) => {
             // Handle node dragging
             if (this.draggedNode) {
                 const dx = (e.clientX - this.dragStartX) / this.scale;
                 const dy = (e.clientY - this.dragStartY) / this.scale;
-                if (this.draggedNode.x !== undefined && this.draggedNode.y !== undefined) {
+                if (this.draggedNode.x !== undefined &&
+                    this.draggedNode.y !== undefined) {
                     // Mark this node as manually positioned
                     this.draggedNode.manuallyPositioned = true;
                     // Get the node group
@@ -325,15 +329,15 @@ class SVGTreeViewer {
                 this._updateTransform();
             }
         });
-        this.svg.addEventListener('mouseup', () => {
+        this.svg.addEventListener("mouseup", () => {
             this.isPanning = false;
             this.draggedNode = null;
         });
-        this.svg.addEventListener('mouseleave', () => {
+        this.svg.addEventListener("mouseleave", () => {
             this.isPanning = false;
             this.draggedNode = null;
         });
-        this.svg.addEventListener('wheel', (e) => {
+        this.svg.addEventListener("wheel", (e) => {
             e.preventDefault();
             const zoomFactor = 1.1;
             const direction = e.deltaY > 0 ? -1 : 1;
@@ -352,7 +356,7 @@ class SVGTreeViewer {
         });
     }
     _setupNodeDragging(nodeGroup, node, handle) {
-        handle.addEventListener('mousedown', (e) => {
+        handle.addEventListener("mousedown", (e) => {
             e.stopPropagation(); // Prevent canvas panning
             e.preventDefault(); // Prevent text selection
             // Set the dragged node
@@ -366,7 +370,7 @@ class SVGTreeViewer {
         });
         // Add double-click event for collapsing/expanding
         if (node.children.length > 0) {
-            handle.addEventListener('dblclick', (e) => {
+            handle.addEventListener("dblclick", (e) => {
                 e.stopPropagation();
                 e.preventDefault();
                 node.collapsed = !node.collapsed;
@@ -391,9 +395,9 @@ class SVGTreeViewer {
     }
     _updateConnections(node) {
         const flat = this._getAllNodes(this.nodes);
-        const map = new Map(flat.map(n => [n.id, n]));
+        const map = new Map(flat.map((n) => [n.id, n]));
         // Update connections where the node is a parent
-        node.children.forEach(child => {
+        node.children.forEach((child) => {
             if (!node.collapsed) {
                 const connection = this.svg.querySelector(`path[data-from="${node.id}"][data-to="${child.id}"]`);
                 if (connection) {
@@ -402,7 +406,7 @@ class SVGTreeViewer {
                     const x1 = (node.x || 0) + nodeWidthHalf;
                     const y1 = (node.y || 0) + this.options.nodeHeight;
                     const x2 = (child.x || 0) + nodeWidthHalf;
-                    const y2 = (child.y || 0);
+                    const y2 = child.y || 0;
                     const dx = (x2 - x1) / 2;
                     //const d = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
                     // Create an S-shaped curve
@@ -422,7 +426,7 @@ class SVGTreeViewer {
                     const x1 = (parent.x || 0) + nodeWidthHalf;
                     const y1 = (parent.y || 0) + this.options.nodeHeight;
                     const x2 = (node.x || 0) + nodeWidthHalf;
-                    const y2 = (node.y || 0);
+                    const y2 = node.y || 0;
                     // const dx = (x2 - x1) / 2;
                     // const d = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
                     // Create an S-shaped curve
@@ -447,9 +451,9 @@ class SVGTreeViewer {
     _renderTree() {
         this.group.innerHTML = "";
         const flat = this._layoutTree(this.nodes);
-        const map = new Map(flat.map(n => [n.id, n]));
+        const map = new Map(flat.map((n) => [n.id, n]));
         // Draw connection lines first so they appear behind the nodes
-        flat.forEach(n => {
+        flat.forEach((n) => {
             if (n.parent_id && map.get(n.parent_id)) {
                 const parent = map.get(n.parent_id);
                 if (parent && !parent.collapsed) {
@@ -459,7 +463,7 @@ class SVGTreeViewer {
                     const x1 = (parent.x || 0) + nodeWidthHalf;
                     const y1 = (parent.y || 0) + this.options.nodeHeight;
                     const x2 = (n.x || 0) + nodeWidthHalf;
-                    const y2 = (n.y || 0);
+                    const y2 = n.y || 0;
                     // const dx = (x2 - x1) / 2;
                     // const d = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
                     // Create an S-shaped curve using the new method
@@ -475,7 +479,7 @@ class SVGTreeViewer {
             }
         });
         // Draw nodes on top of the connection lines
-        flat.forEach(n => {
+        flat.forEach((n) => {
             // Create a group for each node to make dragging easier
             const nodeGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
             nodeGroup.setAttribute("class", "node-group");
@@ -575,7 +579,7 @@ class SVGTreeViewer {
         }
         let minX = Infinity, minY = Infinity;
         let maxX = -Infinity, maxY = -Infinity;
-        nodes.forEach(node => {
+        nodes.forEach((node) => {
             if (node.x !== undefined) {
                 minX = Math.min(minX, node.x);
                 maxX = Math.max(maxX, node.x + this.options.nodeWidth);
@@ -593,11 +597,13 @@ class SVGTreeViewer {
         // First pass: calculate positions using the improved layout algorithm
         const calculatePositions = (node, depth = 0, x = 0) => {
             // Skip manually positioned nodes in the calculation
-            if (node.manuallyPositioned && node.x !== undefined && node.y !== undefined) {
+            if (node.manuallyPositioned &&
+                node.x !== undefined &&
+                node.y !== undefined) {
                 // Still need to process children
                 let totalWidth = 0;
                 if (!node.collapsed) {
-                    node.children.forEach(child => {
+                    node.children.forEach((child) => {
                         const result = calculatePositions(child, depth + 1, x + totalWidth);
                         totalWidth += result.width;
                     });
@@ -641,14 +647,14 @@ class SVGTreeViewer {
         };
         // Process each root node
         let xOffset = 0;
-        nodes.forEach(root => {
+        nodes.forEach((root) => {
             const result = calculatePositions(root, 0, xOffset);
             xOffset += result.width + nodePadding; // Add extra padding between trees
         });
         // Apply minimum x position to avoid negative coordinates
-        const minX = Math.min(...flat.map(n => n.x || 0));
+        const minX = Math.min(...flat.map((n) => n.x || 0));
         if (minX < 0) {
-            flat.forEach(n => {
+            flat.forEach((n) => {
                 if (n.x !== undefined)
                     n.x -= minX;
                 if (n.origX !== undefined)
@@ -661,7 +667,7 @@ class SVGTreeViewer {
         return template.replace(/\[data:(.+?)\]/g, (_, key) => {
             var _a, _b, _c;
             // return dataObj[key] !== undefined ? String(dataObj[key]) : '';
-            return (_c = (_b = (_a = node.data) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b[key]) !== null && _c !== void 0 ? _c : '';
+            return (_c = (_b = (_a = node.data) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b[key]) !== null && _c !== void 0 ? _c : "";
         });
     }
     // Public methods for external control
@@ -689,7 +695,7 @@ class SVGTreeViewer {
      */
     resetNodePositions() {
         const allNodes = this._getAllNodes(this.nodes);
-        allNodes.forEach(node => {
+        allNodes.forEach((node) => {
             node.manuallyPositioned = false;
         });
         this._renderTree();
@@ -701,7 +707,7 @@ class SVGTreeViewer {
      */
     toggleNodeCollapse(id) {
         const allNodes = this._getAllNodes(this.nodes);
-        const node = allNodes.find(n => n.id === id);
+        const node = allNodes.find((n) => n.id === id);
         if (node) {
             node.collapsed = !node.collapsed;
             this._renderTree();
@@ -724,8 +730,12 @@ class SVGTreeViewer {
         const scaleY = containerHeight / (treeHeight + 100); // Add padding
         this.scale = Math.min(scaleX, scaleY, 1); // Don't zoom in more than 1:1
         // Calculate the pan to center
-        this.panX = (containerWidth - treeWidth * this.scale) / 2 - this.treeBounds.minX * this.scale;
-        this.panY = (containerHeight - treeHeight * this.scale) / 2 - this.treeBounds.minY * this.scale;
+        this.panX =
+            (containerWidth - treeWidth * this.scale) / 2 -
+                this.treeBounds.minX * this.scale;
+        this.panY =
+            (containerHeight - treeHeight * this.scale) / 2 -
+                this.treeBounds.minY * this.scale;
         this._updateTransform();
     }
     /**
@@ -740,7 +750,7 @@ class SVGTreeViewer {
         // Find min/max coordinates
         let minX = Infinity, minY = Infinity;
         let maxX = -Infinity, maxY = -Infinity;
-        allNodes.forEach(node => {
+        allNodes.forEach((node) => {
             if (node.x !== undefined) {
                 minX = Math.min(minX, node.x);
                 maxX = Math.max(maxX, node.x + 160); // Node width
@@ -764,14 +774,16 @@ class SVGTreeViewer {
         const scaleY = containerHeight / (maxY - minY);
         this.scale = Math.min(scaleX, scaleY, 1); // Limit max scale to 1
         // Calculate pan to center
-        this.panX = (containerWidth - (maxX - minX) * this.scale) / 2 - minX * this.scale;
-        this.panY = (containerHeight - (maxY - minY) * this.scale) / 2 - minY * this.scale;
+        this.panX =
+            (containerWidth - (maxX - minX) * this.scale) / 2 - minX * this.scale;
+        this.panY =
+            (containerHeight - (maxY - minY) * this.scale) / 2 - minY * this.scale;
         this._updateTransform();
     }
 }
 exports.SVGTreeViewer = SVGTreeViewer;
 // Optional: attach to window for global use
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
     window.SVGTreeViewer = SVGTreeViewer;
 }
 exports.default = SVGTreeViewer;

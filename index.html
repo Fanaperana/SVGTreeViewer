@@ -1,112 +1,107 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <title>Interactive Tree</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      position: relative;
-      height: 100%;
-      width: 100%;
-    }
+  <head>
+    <meta charset="UTF-8">
+    <title>Interactive Tree</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        position: relative;
+        height: 100%;
+        width: 100%;
+      }
 
-    #viewport {
-      width: 100vw;
-      height: 100vh;
-      background: #f8f9fa;
-    }
+      #viewport {
+        width: 100vw;
+        height: 100vh;
+        background: #f8f9fa;
+      }
 
-    .node {
-      font-family: sans-serif;
-      font-size: 14px;
-      background: white;
-      border-radius: 6px;
-      padding: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      width: auto;
-      height: 100%;
-      text-align: center;
-    }
+      .node {
+        font-family: sans-serif;
+        font-size: 14px;
+        background: white;
+        border-radius: 6px;
+        padding: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        width: auto;
+        height: 100%;
+        text-align: center;
+      }
 
-    .node h4 {
-      margin: 0;
-      font-size: 16px;
-    }
+      .node h4 {
+        margin: 0;
+        font-size: 16px;
+      }
 
-    .collapse-btn {
-      margin-top: 8px;
-      padding: 3px 6px;
-      font-size: 12px;
-      border: none;
-      background: #007bff;
-      color: white;
-      border-radius: 4px;
-      cursor: pointer;
-    }
+      .collapse-btn {
+        margin-top: 8px;
+        padding: 3px 6px;
+        font-size: 12px;
+        border: none;
+        background: #007bff;
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+      }
 
-    .collapse-btn:hover {
-      background: #0056b3;
-    }
+      .collapse-btn:hover {
+        background: #0056b3;
+      }
 
-    #reset-button {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-  </style>
-  
-</head>
-<body>
-    
+      #reset-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
     <div id="treeContainer" style="margin: 10px auto;width:80%;height:80%; border-radius:20px; border: 1px solid #e2e2e2; overflow:hidden;  box-shadow: inset 0 20px 60px rgba(0, 0, 0, 0.15); position:relative"></div>
     <script src="./dist/browser/bundle.js"></script>
-    <script>
-        // import * as SVGTreeViewer from './dist/index.js';
-      
-        const data = [
-          { cur_id: 1, user_id: null, data: { title: "Root", src: "#" } },
-          { cur_id: 2, user_id: 1, data: { name: "Gean", title: "Child 1", src: "#" } },
-          { cur_id: 3, user_id: 1, data: { title: "Child 2", src: "#" } },
-          { cur_id: 4, user_id: 3, data: { title: "Child 3", src: "#" } },
-          { cur_id: 5, user_id: 3, data: { title: "Child 4", src: "#" } },
-          { cur_id: 6, user_id: 2, data: { title: "Child 5", src: "#" } },
-          { cur_id: 7, user_id: null, data: { title: "Root 2", src: "#", job: "Suppreme boss" } },
-          { cur_id: 8, user_id: 7, data: { title: "Child 1'", job: "CEO" } },
-          { cur_id: 9, user_id: 8, data: { title: "Child 2'", job: "CFO"} },
-        ];
-      
-        const template = `
-          <div class="node">
-            <h4 style="margin-bottom:5px;">[data:name] [data:title]</h4>
-            <small style='display:block; margin-bottom:15px; color: grey'>[data:job]</small>
-            <a href="[data:src]">View</a>
-          </div>
+    <script>      
+      const data = [
+        { cur_id: 1, user_id: null, data: { title: "Root", src: "#" } },
+        { cur_id: 2, user_id: 1, data: { name: "Gean", title: "Child 1", src: "#" } },
+        { cur_id: 3, user_id: 1, data: { title: "Child 2", src: "#" } },
+        { cur_id: 4, user_id: 3, data: { title: "Child 3", src: "#" } },
+        { cur_id: 5, user_id: 3, data: { title: "Child 4", src: "#" } },
+        { cur_id: 6, user_id: 2, data: { title: "Child 5", src: "#" } },
+        { cur_id: 7, user_id: null, data: { title: "Root 2", src: "#", job: "Suppreme boss" } },
+        { cur_id: 8, user_id: 7, data: { title: "Child 1'", job: "CEO" } },
+        { cur_id: 9, user_id: 8, data: { title: "Child 2'", job: "CFO"} },
+      ];
+    
+      const template = `
+        <div class="node">
+          <h4 style="margin-bottom:5px;">[data:name] [data:title]</h4>
+          <small style='display:block; margin-bottom:15px; color: grey'>[data:job]</small>
+          <a href="[data:src]">View</a>
+        </div>
         `;
-      
-        const treeViewer = new window.SVGTreeViewer({
-          containerId: "treeContainer",
-          data: data,
-          idAlias: "cur_id",
-          parentIdAlias: "user_id",
-          collapseChild: true,
-          template: template,
-          nodeWidth: 240,
-          nodeHeight: 150,
-          levelHeight: 200,
-          horizontalSpacing: 320,
-        });
-      </script>
-      
 
-</body>
+      const treeViewer = new window.SVGTreeViewer({
+        containerId: "treeContainer",
+        data: data,
+        idAlias: "cur_id",
+        parentIdAlias: "user_id",
+        collapseChild: true,
+        template: template,
+        nodeWidth: 240,
+        nodeHeight: 150,
+        levelHeight: 200,
+        horizontalSpacing: 320,
+      });
+    </script>
+  </body>
 </html>

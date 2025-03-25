@@ -13,7 +13,7 @@ interface SVGTreeViewerOptions {
     nodePadding?: number;
     levelHeight?: number;
     horizontalSpacing?: number;
-    backgroundPattern?: 'dots' | 'grid' | 'none';
+    backgroundPattern?: "dots" | "grid" | "none";
     backgroundColor?: string;
     patternColor?: string;
 }

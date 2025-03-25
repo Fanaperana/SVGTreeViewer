@@ -13,6 +13,7 @@
     "build:legacy": "tsc -p tsconfig.legacy.json",
     "build:umd": "tsc -p tsconfig.umd.json",
     "build:all": "npm run build:modern && npm run build:legacy && npm run build:umd",
+    "build:legacy:bundle": "tsc -p tsconfig.legacy.json; webpack --config webpack.config.js",
     "bundle": "webpack",
     "dev": "tsc -w",
     "test": "echo \"Error: no test specified\" && exit 1"
