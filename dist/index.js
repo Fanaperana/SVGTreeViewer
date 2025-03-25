@@ -1,4 +1,7 @@
-export class SVGTreeViewer {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SVGTreeViewer = void 0;
+class SVGTreeViewer {
     constructor(options) {
         this.isPanning = false;
         this.startX = 0;
@@ -766,3 +769,4 @@ export class SVGTreeViewer {
         this._updateTransform();
     }
 }
+exports.SVGTreeViewer = SVGTreeViewer;
