@@ -36,7 +36,7 @@ interface TreeNodeData {
     patternColor?: string;
   }
   
-export class SVGTreeViewer {
+class SVGTreeViewer {
     private options: {
       containerId: string;
       data: TreeNodeData[];
@@ -987,3 +987,13 @@ export class SVGTreeViewer {
       this._updateTransform();
     }
 }
+// Optional: attach to window for global use
+if (typeof window !== 'undefined') {
+    (window as any).SVGTreeViewer = SVGTreeViewer;
+}
+
+export { SVGTreeViewer };
+
+export default SVGTreeViewer;
+
+  

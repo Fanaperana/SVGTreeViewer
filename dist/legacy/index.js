@@ -751,4 +751,9 @@ var SVGTreeViewer = /** @class */ (function () {
     return SVGTreeViewer;
 }());
 exports.SVGTreeViewer = SVGTreeViewer;
+// Optional: attach to window for global use
+if (typeof window !== 'undefined') {
+    window.SVGTreeViewer = SVGTreeViewer;
+}
+exports.default = SVGTreeViewer;
 //# sourceMappingURL=index.js.map

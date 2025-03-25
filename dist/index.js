@@ -770,3 +770,8 @@ class SVGTreeViewer {
     }
 }
 exports.SVGTreeViewer = SVGTreeViewer;
+// Optional: attach to window for global use
+if (typeof window !== 'undefined') {
+    window.SVGTreeViewer = SVGTreeViewer;
+}
+exports.default = SVGTreeViewer;

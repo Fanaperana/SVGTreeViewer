@@ -64,13 +64,14 @@
       cursor: pointer;
     }
   </style>
+  
 </head>
 <body>
     
     <div id="treeContainer" style="margin: 10px auto;width:80%;height:80%; border-radius:20px; border: 1px solid #e2e2e2; overflow:hidden;  box-shadow: inset 0 20px 60px rgba(0, 0, 0, 0.15); position:relative"></div>
-    <!-- <script type="module" src="./dist/main.js"></script> -->
-    <script type="module">
-        import * as SVGTreeViewer from './dist/index.js';
+    <script src="./dist/browser/bundle.js"></script>
+    <script>
+        // import * as SVGTreeViewer from './dist/index.js';
       
         const data = [
           { cur_id: 1, user_id: null, data: { title: "Root", src: "#" } },
@@ -92,7 +93,7 @@
           </div>
         `;
       
-        const treeViewer = new SVGTreeViewer.SVGTreeViewer({
+        const treeViewer = new window.SVGTreeViewer({
           containerId: "treeContainer",
           data: data,
           idAlias: "cur_id",

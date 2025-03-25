@@ -17,7 +17,7 @@ interface SVGTreeViewerOptions {
     backgroundColor?: string;
     patternColor?: string;
 }
-export declare class SVGTreeViewer {
+declare class SVGTreeViewer {
     private options;
     private nodes;
     private scale;
@@ -95,4 +95,5 @@ export declare class SVGTreeViewer {
      */
     zoomToFit(): void;
 }
-export {};
+export { SVGTreeViewer };
+export default SVGTreeViewer;

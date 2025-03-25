@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+      "target": "ES5",                     // Compatible with most browsers
+      "module": "UMD",                     // <-- Universal Module Definition
+      "outDir": "./dist/umd",
+      "declaration": true,
+      "esModuleInterop": true,
+      "sourceMap": false,
+      "removeComments": true,
+      "lib": ["dom", "es5", "es6", "es2015.collection", "es2015.iterable", "es2015.promise"],
+      "types": [],
+    },
+    "include": ["src/**/*"]
+}
+  
