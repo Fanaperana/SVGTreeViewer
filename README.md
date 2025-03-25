@@ -63,12 +63,15 @@ Download the latest release from the GitHub repository and include it in your pr
     <script>
         // Sample data
         const treeData = [
-            { id: 1, parent_id: null, text: "Root Node" },
-            { id: 2, parent_id: 1, text: "Child 1" },
-            { id: 3, parent_id: 1, text: "Child 2" },
-            { id: 4, parent_id: 2, text: "Grandchild 1" },
-            { id: 5, parent_id: 2, text: "Grandchild 2" },
-            { id: 6, parent_id: null, text: "Another Root" }
+            { ID: 1, parent_id: null, data: { title: "Root", src: "#" } },
+            { ID: 2, parent_id: 1, data: { name: "Gean", title: "Child 1", src: "#" } },
+            { ID: 3, parent_id: 1, data: { title: "Child 2", src: "#" } },
+            { ID: 4, parent_id: 3, data: { title: "Child 3", src: "#" } },
+            { ID: 5, parent_id: 3, data: { title: "Child 4", src: "#" } },
+            { ID: 6, parent_id: 2, data: { title: "Child 5", src: "#" } },
+            { ID: 7, parent_id: null, data: { title: "Root 2", src: "#", job: "Suppreme boss" } },
+            { ID: 8, parent_id: 7, data: { title: "Child 1'", job: "CEO" } },
+            { ID: 9, parent_id: 8, data: { title: "Child 2'", job: "CFO"} },
         ];
         
         // Initialize the tree viewer
@@ -111,12 +114,23 @@ SVGTreeViewer uses a flat array of objects with parent-child relationships:
 
 ```javascript
 [
-  { id: 1, parent_id: null, text: "Root Node" },
-  { id: 2, parent_id: 1, text: "Child Node" }
+  { id: 1, parent_id: null, data: { text: "Root Node" } },
+  { id: 2, parent_id: 1, data: { text: "Child Node" } }
 ]
 ```
 
 Each object can contain any additional properties that can be referenced in the node template using `[data:propertyName]`.
+
+So, for this example, it will be `[data:text]` in the template:
+
+```javascript
+var template = `<div>[data:text]</div>`;
+
+const treeViewer = new SVGTreeViewer({
+                                        ...
+                                        template: template,
+                                    });
+```
 
 ### Methods
 
