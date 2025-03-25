@@ -9,6 +9,8 @@
       padding: 0;
       overflow: hidden;
       position: relative;
+      height: 100%;
+      width: 100%;
     }
 
     #viewport {
@@ -65,8 +67,7 @@
 </head>
 <body>
     
-    <div id="treeContainer" style="width:100vw;height:100vh;"></div>
-    <button id="reset-button">Reset</button>
+    <div id="treeContainer" style="margin: 10px auto;width:80%;height:80%; border-radius:20px; border: 1px solid #e2e2e2; overflow:hidden;  box-shadow: inset 0 20px 60px rgba(0, 0, 0, 0.15); position:relative"></div>
     <!-- <script type="module" src="./dist/main.js"></script> -->
     <script type="module">
         import * as SVGTreeViewer from './dist/index.js';
@@ -78,11 +79,15 @@
           { cur_id: 4, user_id: 3, data: { title: "Child 3", src: "#" } },
           { cur_id: 5, user_id: 3, data: { title: "Child 4", src: "#" } },
           { cur_id: 6, user_id: 2, data: { title: "Child 5", src: "#" } },
+          { cur_id: 7, user_id: null, data: { title: "Root 2", src: "#", job: "Suppreme boss" } },
+          { cur_id: 8, user_id: 7, data: { title: "Child 1'", job: "CEO" } },
+          { cur_id: 9, user_id: 8, data: { title: "Child 2'", job: "CFO"} },
         ];
       
         const template = `
           <div class="node">
-            <h4>[data:name] [data:title]</h4>
+            <h4 style="margin-bottom:5px;">[data:name] [data:title]</h4>
+            <small style='display:block; margin-bottom:15px; color: grey'>[data:job]</small>
             <a href="[data:src]">View</a>
           </div>
         `;
@@ -95,16 +100,10 @@
           collapseChild: true,
           template: template,
           nodeWidth: 240,
-          nodeHeight: 120,
-          levelHeight: 160,
+          nodeHeight: 150,
+          levelHeight: 200,
           horizontalSpacing: 320,
         });
-
-        document.getElementById('reset-button')?.addEventListener('click', () => {
-            treeViewer.resetNodePositions();
-            treeViewer.centerTree();
-            //treeViewer.resetView();
-          });
       </script>
       
 

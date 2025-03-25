@@ -30,6 +30,10 @@ interface TreeNodeData {
     nodePadding?: number;
     levelHeight?: number;
     horizontalSpacing?: number;
+    // New option for background
+    backgroundPattern?: 'dots' | 'grid' | 'none';
+    backgroundColor?: string;
+    patternColor?: string;
   }
   
 export class SVGTreeViewer {
@@ -45,6 +49,9 @@ export class SVGTreeViewer {
       nodePadding: number;
       levelHeight: number;
       horizontalSpacing: number;
+      backgroundPattern: 'dots' | 'grid' | 'none';
+        backgroundColor: string;
+        patternColor: string;
     };
     
     private nodes: TreeNode[];
@@ -76,7 +83,10 @@ export class SVGTreeViewer {
         nodeHeight: options.nodeHeight || 100,
         nodePadding: options.nodePadding || 40,
         levelHeight: options.levelHeight || 150,
-        horizontalSpacing: options.horizontalSpacing || 200
+        horizontalSpacing: options.horizontalSpacing || 200,
+        backgroundPattern: options.backgroundPattern || 'dots',
+        backgroundColor: options.backgroundColor || '#f9f9f9',
+        patternColor: options.patternColor || '#cccccc'
       };
   
       this.nodes = this._buildTree();
@@ -90,6 +100,100 @@ export class SVGTreeViewer {
 
       // Center the tree after initial rendering
       this.centerTree();
+    }
+
+    /**
+     * Create a dot pattern element
+     * @returns SVG defs element containing a dot pattern
+     */
+    private _createDotPattern(): SVGDefsElement {
+        const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+        
+        const pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern");
+        pattern.setAttribute("id", "dotPattern");
+        pattern.setAttribute("width", "20");
+        pattern.setAttribute("height", "20");
+        pattern.setAttribute("patternUnits", "userSpaceOnUse");
+        
+        const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        dot.setAttribute("cx", "2");
+        dot.setAttribute("cy", "2");
+        dot.setAttribute("r", "1.0");
+        dot.setAttribute("fill", this.options.patternColor);
+        
+        pattern.appendChild(dot);
+        defs.appendChild(pattern);
+        
+        return defs;
+    }
+    
+    /**
+     * Create a grid pattern element
+     * @returns SVG defs element containing a grid pattern
+     */
+    private _createGridPattern(): SVGDefsElement {
+        const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+        
+        const pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern");
+        pattern.setAttribute("id", "gridPattern");
+        pattern.setAttribute("width", "20");
+        pattern.setAttribute("height", "20");
+        pattern.setAttribute("patternUnits", "userSpaceOnUse");
+        
+        // Horizontal line
+        const hLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        hLine.setAttribute("x1", "0");
+        hLine.setAttribute("y1", "0");
+        hLine.setAttribute("x2", "20");
+        hLine.setAttribute("y2", "0");
+        hLine.setAttribute("stroke", this.options.patternColor);
+        hLine.setAttribute("stroke-width", "0.5");
+        
+        // Vertical line
+        const vLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        vLine.setAttribute("x1", "0");
+        vLine.setAttribute("y1", "0");
+        vLine.setAttribute("x2", "0");
+        vLine.setAttribute("y2", "20");
+        vLine.setAttribute("stroke", this.options.patternColor);
+        vLine.setAttribute("stroke-width", "0.5");
+        
+        pattern.appendChild(hLine);
+        pattern.appendChild(vLine);
+        defs.appendChild(pattern);
+        
+        return defs;
+    }
+    
+    /**
+     * Apply the selected pattern to the SVG
+     * @param svg The SVG element to apply the pattern to
+     */
+    private _applyBackgroundPattern(svg: SVGSVGElement): void {
+        if (this.options.backgroundPattern === 'none') {
+        return;
+        }
+        
+        let defs: SVGDefsElement;
+        let patternId: string;
+        
+        // Create the pattern based on the option
+        if (this.options.backgroundPattern === 'dots') {
+        defs = this._createDotPattern();
+        patternId = "dotPattern";
+        } else {
+        defs = this._createGridPattern();
+        patternId = "gridPattern";
+        }
+        
+        svg.appendChild(defs);
+        
+        // Create the background rectangle with the pattern
+        const patternRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        patternRect.setAttribute("width", "100%");
+        patternRect.setAttribute("height", "100%");
+        patternRect.setAttribute("fill", `url(#${patternId})`);
+        svg.appendChild(patternRect);
     }
   
     private _buildTree(): TreeNode[] {
@@ -120,6 +224,154 @@ export class SVGTreeViewer {
   
       return roots;
     }
+
+    /**
+     * 
+     */
+    private _renderActionButtons(wrapper: HTMLElement): void {
+        const zoomeInBtn = document.createElement("button");
+        const zoomOutBtn = document.createElement("button");
+        const resetBtn = document.createElement("button");
+        const centerBtn = document.createElement("button");
+
+        zoomeInBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zoom-in"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="11" x2="11" y1="8" y2="14"/><line x1="8" x2="14" y1="11" y2="11"/></svg>`; // Plus
+        zoomOutBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zoom-out"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="8" x2="14" y1="11" y2="11"/></svg>`; // Minus  
+        resetBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-cw"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>`; // Reset 
+        centerBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-maximize"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>`; // center   
+
+        zoomeInBtn.title = "Zoom in";
+        zoomOutBtn.title = "Zoom out";
+        resetBtn.title = "Reset view";
+        centerBtn.title = "Center tree";
+
+        zoomeInBtn.onmouseenter = () => {
+            zoomeInBtn.style.opacity = '0.9';
+        }
+        zoomeInBtn.onmouseleave = () => {
+            zoomeInBtn.style.opacity = '.3';
+        }
+
+        zoomOutBtn.onmouseenter = () => {
+            zoomOutBtn.style.opacity = '0.9';
+        }
+        zoomOutBtn.onmouseleave = () => {
+            zoomOutBtn.style.opacity = '.3';
+        }
+
+        resetBtn.onmouseenter = () => {
+            resetBtn.style.opacity = '0.9';
+        }
+        resetBtn.onmouseleave = () => {
+            resetBtn.style.opacity = '.3';
+        }
+
+        centerBtn.onmouseenter = () => {
+            centerBtn.style.opacity = '0.9';
+        }
+        centerBtn.onmouseleave = () => {
+            centerBtn.style.opacity = '.3';
+        }
+
+        zoomeInBtn.style.cssText = `
+            margin: 4px;
+            padding: 4px 6px;
+            font-size: 12px;
+            background:rgb(246, 238, 226, 0.5);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            opacity: 0.3;
+        `;
+
+        zoomOutBtn.style.cssText = `
+            margin: 4px;
+            padding: 4px 6px;
+            font-size: 12px;
+            background:rgb(246, 238, 226, 0.5);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            opacity: 0.3;
+        `;
+
+        resetBtn.style.cssText = `
+            margin: 4px;
+            padding: 4px 6px;
+            font-size: 12px;
+            background:rgb(246, 238, 226, 0.5);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            opacity: 0.3;
+        `;
+
+        centerBtn.style.cssText = `
+            margin: 4px;
+            padding: 4px 6px;
+            font-size: 12px;
+            background:rgb(246, 238, 226, 0.5);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            opacity: 0.3;
+        `;
+
+        zoomeInBtn.onclick = () => {
+            this.scale *= 1.1;
+            this._updateTransform();
+        };
+
+        zoomOutBtn.onclick = () => {
+            this.scale /= 1.1;
+            this._updateTransform();
+        };
+
+        resetBtn.onclick = () => {
+            this.resetView();
+        };
+
+        centerBtn.onclick = () => {
+            this.centerTree();
+        };
+
+        const btn_wrapper = document.createElement("div");
+
+        wrapper.style.position = 'relative';
+
+        // wrapper.onmouseenter = () => {
+        //     btn_wrapper.style.opacity = '0.5';
+        // }
+
+        // wrapper.onmouseleave = () => {
+        //     btn_wrapper.style.opacity = '0.1';
+        // }
+
+        btn_wrapper.style.cssText = `
+            display: flex; 
+            flex-direction: column;
+            gap: 5px;
+            justify-content: center;
+            width: 100%;
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 40px;
+            z-index: 100;
+            pointer-events: auto;
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease;
+        `;
+
+        btn_wrapper.append(zoomeInBtn, zoomOutBtn, resetBtn, centerBtn);
+        wrapper.append(btn_wrapper);
+    }
   
     private _renderSVG(): void {
       const container = document.getElementById(this.options.containerId);
@@ -132,7 +384,15 @@ export class SVGTreeViewer {
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.setAttribute("width", "100%");
       svg.setAttribute("height", "100%");
-      svg.style.background = "#f9f9f9";
+      
+      // Set the background color
+      svg.style.background = this.options.backgroundColor;
+
+      // Apply the background pattern
+      this._applyBackgroundPattern(svg);
+
+      // Add action buttons
+      this._renderActionButtons(container);
   
       this.group = document.createElementNS("http://www.w3.org/2000/svg", "g");
       this.group.setAttribute("id", "panZoomGroup");
@@ -220,7 +480,7 @@ export class SVGTreeViewer {
         // New pan to keep the pointer under cursor
         this.panX = offsetX - svgX * this.scale;
         this.panY = offsetY - svgY * this.scale;
-        
+
         this._updateTransform();
       });
     }
@@ -444,8 +704,8 @@ export class SVGTreeViewer {
             margin-top: 8px;
             padding: 4px 6px;
             font-size: 12px;
-            background:rgb(37, 36, 36);
-            color: white;
+            background:rgb(246, 238, 226);
+            color: black;
             border: none;
             border-radius: 4px;
             cursor: pointer;

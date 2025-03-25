@@ -13,6 +13,9 @@ interface SVGTreeViewerOptions {
     nodePadding?: number;
     levelHeight?: number;
     horizontalSpacing?: number;
+    backgroundPattern?: 'dots' | 'grid' | 'none';
+    backgroundColor?: string;
+    patternColor?: string;
 }
 export declare class SVGTreeViewer {
     private options;
@@ -30,7 +33,26 @@ export declare class SVGTreeViewer {
     private dragStartY;
     private treeBounds;
     constructor(options: SVGTreeViewerOptions);
+    /**
+     * Create a dot pattern element
+     * @returns SVG defs element containing a dot pattern
+     */
+    private _createDotPattern;
+    /**
+     * Create a grid pattern element
+     * @returns SVG defs element containing a grid pattern
+     */
+    private _createGridPattern;
+    /**
+     * Apply the selected pattern to the SVG
+     * @param svg The SVG element to apply the pattern to
+     */
+    private _applyBackgroundPattern;
     private _buildTree;
+    /**
+     *
+     */
+    private _renderActionButtons;
     private _renderSVG;
     private _attachEvents;
     private _setupNodeDragging;
