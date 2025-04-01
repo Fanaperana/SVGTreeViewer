@@ -195,6 +195,84 @@ interface TreeNodeData {
 
 MIT License
 
+## Development
+
+### Prerequisites
+
+- Node.js (v14 or later)
+- npm (v6 or later)
+
+### Setup
+
+1. Clone the repository
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+### Development Server
+
+Run the development server with hot reload:
+
+```bash
+npm run dev:vite
+```
+This will start a dev server at `http://localhost:5173`
+
+### Building
+
+#### Production Build
+
+To create a production build:
+
+```bash
+npm run build:vite
+```
+
+This generates optimized files in the `dist` folder:
+
+- `bundle.js` - Minified JavaScript bundle
+- `bundle.js.map` - Source map file
+
+#### Preview Production Build
+
+To preview the production build locally:
+
+```bash
+npm run preview
+```
+
+### Build Options
+
+The project supports multiple build configurations:
+
+| Command | Output | Description |
+|---------|--------|-------------|
+| `npm run build:vite` | Production bundle | Optimized, minified build |
+| `npm run dev:vite` | Development server | Hot-reload enabled |
+| `npm run preview` | Production preview | Test production build |
+
+### Build Output
+
+The production build generates files in the `dist` directory:
+
+```
+dist/
+  ├── bundle.js        # Main library bundle
+  ├── bundle.js.map    # Source maps
+  └── index.html       # Demo page
+```
+
+### Environment Variables
+
+Build can be customized using `.env` files:
+
+```env
+VITE_APP_PORT=3000        # Dev server port
+VITE_APP_BASE_URL=/       # Base URL for production
+```
+
 ## Contributing
 
 Contributions welcome! Please:
