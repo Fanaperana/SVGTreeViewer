@@ -5,7 +5,6 @@ interface TreeNodeData {
 interface TreeNode {
   id: string | number;
   parent_id: string | number | null;
-  children: TreeNode[];
   collapsed: boolean;
   data: TreeNodeData;
   x?: number;
@@ -16,6 +15,13 @@ interface TreeNode {
   origY?: number;
   // Track if this node has been manually positioned
   manuallyPositioned?: boolean;
+  
+  children: TreeNode[];
+  parent: TreeNode | null;
+  current_node_element: SVGGElement;
+  parent_node_element: SVGGElement | null;
+  child_node_elements: SVGGElement[];
+  isSelected?: boolean;
 }
 
 interface SVGTreeViewerOptions {
@@ -132,7 +138,7 @@ class SVGTreeViewer {
     );
     dot.setAttribute("cx", "2");
     dot.setAttribute("cy", "2");
-    dot.setAttribute("r", "1.0");
+    dot.setAttribute("r", "0.5");
     dot.setAttribute("fill", this.options.patternColor);
 
     pattern.appendChild(dot);
@@ -168,6 +174,7 @@ class SVGTreeViewer {
     hLine.setAttribute("y2", "0");
     hLine.setAttribute("stroke", this.options.patternColor);
     hLine.setAttribute("stroke-width", "0.5");
+    hLine.setAttribute("stroke-dasharray", "5, 5");
 
     // Vertical line
     const vLine = document.createElementNS(
@@ -180,6 +187,8 @@ class SVGTreeViewer {
     vLine.setAttribute("y2", "20");
     vLine.setAttribute("stroke", this.options.patternColor);
     vLine.setAttribute("stroke-width", "0.5");
+    vLine.setAttribute("stroke-dasharray", "5, 5");
+
 
     pattern.appendChild(hLine);
     pattern.appendChild(vLine);
@@ -230,10 +239,18 @@ class SVGTreeViewer {
       ...d,
       id: d[idAlias],
       parent_id: d[parentIdAlias],
-      children: [],
       collapsed: false,
       data: d,
+      parent: null,
+      children: [],
       manuallyPositioned: false,
+      current_node_element: document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "g"
+      ) as SVGGElement,
+      parent_node_element: null,
+      child_node_elements: [], // Added missing property
+      isSelected: false,
     }));
 
     flat.forEach((n) => map.set(n.id, n));
@@ -241,10 +258,16 @@ class SVGTreeViewer {
     const roots: TreeNode[] = [];
     flat.forEach((n) => {
       if (n.parent_id == null) {
+        n.parent = null;
         roots.push(n);
       } else {
         const parent = map.get(n.parent_id);
-        if (parent) parent.children.push(n);
+        if (parent) {
+          n.parent = parent;
+          n.parent_node_element = parent.current_node_element;
+          parent.child_node_elements.push(n.current_node_element);
+          parent.children.push(n);
+        }
       }
     });
 
@@ -381,7 +404,7 @@ class SVGTreeViewer {
     // }
 
     btn_wrapper.style.cssText = `
-            display: flex; 
+            display: flex;
             flex-direction: column;
             gap: 5px;
             justify-content: center;
@@ -554,6 +577,8 @@ class SVGTreeViewer {
         this.centerTree();
       });
     }
+
+
   }
 
   // Method to create an S-shaped curve
@@ -569,11 +594,11 @@ class SVGTreeViewer {
     // Calculate control points - key to creating the S-curve effect
     // First control point is below starting point
     const cp1x = x1;
-    const cp1y = y1 + dy * 0.3; // 30% down the vertical distance
+    const cp1y = y1 + dy * 0.5; // 50% down the vertical distance
 
     // Second control point is above ending point
     const cp2x = x2;
-    const cp2y = y2 - dy * 0.3; // 30% up from the ending point
+    const cp2y = y2 - dy * 0.5; // 50% up from the ending point
 
     // Create bezier curve command
     return `M ${x1} ${y1} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x2} ${y2}`;
@@ -597,9 +622,6 @@ class SVGTreeViewer {
           const y1 = (node.y || 0) + this.options.nodeHeight;
           const x2 = (child.x || 0) + nodeWidthHalf;
           const y2 = child.y || 0;
-          const dx = (x2 - x1) / 2;
-
-          //const d = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
 
           // Create an S-shaped curve
           const d = this._createSCurve(x1, y1, x2, y2);
@@ -658,10 +680,23 @@ class SVGTreeViewer {
   private _renderTree(): void {
     this.group.innerHTML = "";
     const flat = this._layoutTree(this.nodes);
-
     const map = new Map(flat.map((n) => [n.id, n]));
 
-    // Draw connection lines first so they appear behind the nodes
+    this._drawConnectionLines(flat, map);
+    this._drawNodes(flat);
+
+    console.log(flat);
+
+
+    this._updateTransform();
+    const allNodes = this._getAllNodes(this.nodes);
+    this._calculateTreeBounds(allNodes);
+  }
+
+  private _drawConnectionLines(
+    flat: TreeNode[],
+    map: Map<string | number, TreeNode>
+  ): void {
     flat.forEach((n) => {
       if (n.parent_id && map.get(n.parent_id)) {
         const parent = map.get(n.parent_id);
@@ -671,18 +706,12 @@ class SVGTreeViewer {
             "path"
           );
 
-          // Use nodeWidth/2 for horizontal center
           const nodeWidthHalf = this.options.nodeWidth / 2;
-
           const x1 = (parent.x || 0) + nodeWidthHalf;
           const y1 = (parent.y || 0) + this.options.nodeHeight;
           const x2 = (n.x || 0) + nodeWidthHalf;
           const y2 = n.y || 0;
-          // const dx = (x2 - x1) / 2;
 
-          // const d = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
-
-          // Create an S-shaped curve using the new method
           const d = this._createSCurve(x1, y1, x2, y2);
 
           path.setAttribute("d", d);
@@ -696,118 +725,199 @@ class SVGTreeViewer {
         }
       }
     });
+  }
 
-    // Draw nodes on top of the connection lines
+  private _drawNodes(flat: TreeNode[]): void {
     flat.forEach((n) => {
-      // Create a group for each node to make dragging easier
-      const nodeGroup = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "g"
-      );
-      nodeGroup.setAttribute("class", "node-group");
-      nodeGroup.setAttribute("data-id", String(n.id));
-      nodeGroup.setAttribute(
-        "transform",
-        `translate(${n.x || 0}, ${n.y || 0})`
-      );
+      this._setupNodeGroup(n);
+      this._setupNodeDragHandle(n);
+      this._setupNodeContent(n);
 
-      // Add invisible drag handle that's larger than the visible node for easier dragging
-      const dragHandle = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "rect"
-      );
-      dragHandle.setAttribute("width", String(this.options.nodeWidth));
-      dragHandle.setAttribute("height", String(this.options.nodeHeight));
-      dragHandle.setAttribute("fill", "transparent");
-      dragHandle.setAttribute("class", "drag-handle");
-      dragHandle.setAttribute("cursor", "move");
-      nodeGroup.appendChild(dragHandle);
+      this.group.appendChild(n.current_node_element);
 
-      // Set up dragging for this specific node
-      this._setupNodeDragging(nodeGroup, n, dragHandle);
-
-      const f = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "foreignObject"
-      );
-      f.setAttribute("width", String(this.options.nodeWidth));
-      f.setAttribute("height", String(this.options.nodeHeight));
-
-      const div = document.createElement("div");
-      div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-      div.innerHTML = this._processTemplate(this.options.template, n);
-      div.style.cssText = `
-          font-family: sans-serif;
-          background: white;
-          border: 1px solid #ccc;
-          border-radius: 6px;
-          padding: 10px;
-          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-          width: 100%;
-          height: 100%;
-          box-sizing: border-box;
-          overflow: auto;
-          display: flex;
-          object-fit: contain;
-          flex-direction: column;
-          position: relative;
-          item-align: center;
-          justify-content: center;
-        `;
-
-      if (this.options.collapseChild && n.children.length > 0) {
-        const btn_wrapper = document.createElement("div");
-        btn_wrapper.style.cssText = `
-            display: flex; 
-            justify-content: center;
-            width: 100%;
-        `;
-        const btn = document.createElement("button");
-        btn.className = "collapse-btn";
-        btn.innerHTML = n.collapsed
-          ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' // Chevron down
-          : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 15L12 9L6 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'; // Chevron up
-        btn.title = n.collapsed ? "Expand children" : "Collapse children";
-        btn.style.cssText = `
-            margin-top: 8px;
-            padding: 4px 6px;
-            font-size: 12px;
-            background:rgb(246, 238, 226);
-            color: black;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-          `;
-        btn.onclick = (e) => {
-          e.stopPropagation(); // Prevent dragging when clicking the button
-          n.collapsed = !n.collapsed;
-          this._renderTree();
-        };
-        btn_wrapper.appendChild(btn);
-        div.appendChild(btn_wrapper);
-      }
-
-      f.appendChild(div);
-      nodeGroup.appendChild(f);
-
-      // Add the node group to the main group
-      this.group.appendChild(nodeGroup);
-
-      // Adjust height if needed - this is optional since we're using fixed dimensions now
       if (this.options.nodeHeight <= 0) {
-        requestAnimationFrame(() => {
-          const contentHeight = div.getBoundingClientRect().height;
-          const height = Math.max(contentHeight, 40); // Ensure minimum height
-          f.setAttribute("height", String(height));
-          dragHandle.setAttribute("height", String(height));
-        });
+        this._adjustNodeHeight(n);
       }
     });
-
-    this._updateTransform();
-    const allNodes = this._getAllNodes(this.nodes);
-    this._calculateTreeBounds(allNodes);
   }
+
+  private _setupNodeGroup(node: TreeNode): void {
+    node.current_node_element.setAttribute("class", "node-group");
+    node.current_node_element.setAttribute("data-id", String(node.id));
+    node.current_node_element.setAttribute(
+      "transform",
+      `translate(${node.x || 0}, ${node.y || 0})`
+    );
+
+    // Enable dragging for this node
+    this._enableNodeDragging(node);
+  }
+
+  private _enableNodeDragging(node: TreeNode): void {
+    const element = node.current_node_element;
+    
+    // Clean up existing listeners if any
+    const cleanupKey = `drag_cleanup_${node.id}`;
+    if ((element as any)[cleanupKey]) {
+        (element as any)[cleanupKey]();
+    }
+
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+
+    const onMouseDown = (e: MouseEvent) => {
+        if (e.target instanceof Element && e.target.closest('.collapse-btn')) {
+            return; // Ignore if clicking collapse button
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        element.classList.add("dragging");
+    };
+
+    const onMouseMove = (e: MouseEvent) => {
+        if (!isDragging) return;
+
+        const dx = (e.clientX - startX) / this.scale;
+        const dy = (e.clientY - startY) / this.scale;
+
+        if (node.x !== undefined && node.y !== undefined) {
+            node.x += dx;
+            node.y += dy;
+            element.setAttribute("transform", `translate(${node.x}, ${node.y})`);
+            this._updateConnections(node);
+        }
+
+        startX = e.clientX;
+        startY = e.clientY;
+    };
+
+    const onMouseUp = () => {
+        if (!isDragging) return;
+        isDragging = false;
+        element.classList.remove("dragging");
+    };
+
+    // Attach listeners
+    element.addEventListener("mousedown", onMouseDown);
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+
+    // Store cleanup function
+    (element as any)[cleanupKey] = () => {
+        element.removeEventListener("mousedown", onMouseDown);
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+    };
+  }
+
+  private _setupNodeDragHandle(node: TreeNode): void {
+    const dragHandle = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "rect"
+    );
+    dragHandle.setAttribute("width", String(this.options.nodeWidth));
+    dragHandle.setAttribute("height", String(this.options.nodeHeight));
+    dragHandle.setAttribute("fill", "transparent");
+    dragHandle.setAttribute("class", "drag-handle");
+    dragHandle.setAttribute("cursor", "move");
+    node.current_node_element.appendChild(dragHandle);
+
+    this._setupNodeDragging(node.current_node_element, node, dragHandle);
+  }
+
+  private _setupNodeContent(node: TreeNode): void {
+    const f = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "foreignObject"
+    );
+    f.setAttribute("width", String(this.options.nodeWidth));
+    f.setAttribute("height", String(this.options.nodeHeight));
+
+    const div = document.createElement("div");
+    div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+    div.innerHTML = this._processTemplate(this.options.template, node);
+    div.style.cssText = `
+        font-family: sans-serif;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        padding: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        overflow: auto;
+        display: flex;
+        object-fit: contain;
+        flex-direction: column;
+        position: relative;
+        item-align: center;
+        justify-content: center;
+    `;
+
+    if (this.options.collapseChild && node.children.length > 0) {
+      this._addCollapseButton(node, div);
+    }
+
+    f.appendChild(div);
+    node.current_node_element.appendChild(f);
+  }
+
+  private _addCollapseButton(node: TreeNode, container: HTMLElement): void {
+    const btnWrapper = document.createElement("div");
+    btnWrapper.style.cssText = `
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    `;
+
+    const btn = document.createElement("button");
+    btn.className = "collapse-btn";
+    btn.innerHTML = node.collapsed
+      ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 15L12 9L6 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    btn.title = node.collapsed ? "Expand children" : "Collapse children";
+    btn.style.cssText = `
+        margin-top: 8px;
+        padding: 4px 6px;
+        font-size: 12px;
+        background:rgb(246, 238, 226);
+        color: black;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    `;
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      node.collapsed = !node.collapsed;
+      this._renderTree();
+    };
+
+    btnWrapper.appendChild(btn);
+    container.appendChild(btnWrapper);
+  }
+
+  private _adjustNodeHeight(node: TreeNode): void {
+    const div = node.current_node_element.querySelector("div") as HTMLElement;
+    const f = node.current_node_element.querySelector(
+      "foreignObject"
+    ) as SVGForeignObjectElement;
+    const dragHandle = node.current_node_element.querySelector(
+      "rect"
+    ) as SVGRectElement;
+
+    requestAnimationFrame(() => {
+      const contentHeight = div.getBoundingClientRect().height;
+      const height = Math.max(contentHeight, 40);
+      f.setAttribute("height", String(height));
+      dragHandle.setAttribute("height", String(height));
+    });
+  }
+
 
   /**
    * Calculate the bounds of the entire tree
@@ -955,8 +1065,8 @@ class SVGTreeViewer {
    */
   public resetView(): void {
     this.scale = 1;
-    this.panX = 0;
-    this.panY = 0;
+    this.panX = 50;
+    this.panY = 50;
     this._updateTransform();
   }
 
@@ -1069,6 +1179,7 @@ class SVGTreeViewer {
     this._updateTransform();
   }
 }
+
 // Optional: attach to window for global use
 if (typeof window !== "undefined") {
   (window as any).SVGTreeViewer = SVGTreeViewer;
