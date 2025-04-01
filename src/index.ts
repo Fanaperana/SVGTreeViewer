@@ -15,7 +15,7 @@ interface TreeNode {
   origY?: number;
   // Track if this node has been manually positioned
   manuallyPositioned?: boolean;
-  
+
   children: TreeNode[];
   parent: TreeNode | null;
   current_node_element: SVGGElement;
@@ -188,7 +188,6 @@ class SVGTreeViewer {
     vLine.setAttribute("stroke", this.options.patternColor);
     vLine.setAttribute("stroke-width", "0.5");
     vLine.setAttribute("stroke-dasharray", "5, 5");
-
 
     pattern.appendChild(hLine);
     pattern.appendChild(vLine);
@@ -577,8 +576,6 @@ class SVGTreeViewer {
         this.centerTree();
       });
     }
-
-
   }
 
   // Method to create an S-shaped curve
@@ -687,7 +684,6 @@ class SVGTreeViewer {
 
     console.log(flat);
 
-
     this._updateTransform();
     const allNodes = this._getAllNodes(this.nodes);
     this._calculateTreeBounds(allNodes);
@@ -755,11 +751,11 @@ class SVGTreeViewer {
 
   private _enableNodeDragging(node: TreeNode): void {
     const element = node.current_node_element;
-    
+
     // Clean up existing listeners if any
     const cleanupKey = `drag_cleanup_${node.id}`;
     if ((element as any)[cleanupKey]) {
-        (element as any)[cleanupKey]();
+      (element as any)[cleanupKey]();
     }
 
     let isDragging = false;
@@ -767,38 +763,38 @@ class SVGTreeViewer {
     let startY = 0;
 
     const onMouseDown = (e: MouseEvent) => {
-        if (e.target instanceof Element && e.target.closest('.collapse-btn')) {
-            return; // Ignore if clicking collapse button
-        }
-        e.preventDefault();
-        e.stopPropagation();
-        isDragging = true;
-        startX = e.clientX;
-        startY = e.clientY;
-        element.classList.add("dragging");
+      if (e.target instanceof Element && e.target.closest(".collapse-btn")) {
+        return; // Ignore if clicking collapse button
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      isDragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      element.classList.add("dragging");
     };
 
     const onMouseMove = (e: MouseEvent) => {
-        if (!isDragging) return;
+      if (!isDragging) return;
 
-        const dx = (e.clientX - startX) / this.scale;
-        const dy = (e.clientY - startY) / this.scale;
+      const dx = (e.clientX - startX) / this.scale;
+      const dy = (e.clientY - startY) / this.scale;
 
-        if (node.x !== undefined && node.y !== undefined) {
-            node.x += dx;
-            node.y += dy;
-            element.setAttribute("transform", `translate(${node.x}, ${node.y})`);
-            this._updateConnections(node);
-        }
+      if (node.x !== undefined && node.y !== undefined) {
+        node.x += dx;
+        node.y += dy;
+        element.setAttribute("transform", `translate(${node.x}, ${node.y})`);
+        this._updateConnections(node);
+      }
 
-        startX = e.clientX;
-        startY = e.clientY;
+      startX = e.clientX;
+      startY = e.clientY;
     };
 
     const onMouseUp = () => {
-        if (!isDragging) return;
-        isDragging = false;
-        element.classList.remove("dragging");
+      if (!isDragging) return;
+      isDragging = false;
+      element.classList.remove("dragging");
     };
 
     // Attach listeners
@@ -808,9 +804,9 @@ class SVGTreeViewer {
 
     // Store cleanup function
     (element as any)[cleanupKey] = () => {
-        element.removeEventListener("mousedown", onMouseDown);
-        document.removeEventListener("mousemove", onMouseMove);
-        document.removeEventListener("mouseup", onMouseUp);
+      element.removeEventListener("mousedown", onMouseDown);
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
     };
   }
 
@@ -917,7 +913,6 @@ class SVGTreeViewer {
       dragHandle.setAttribute("height", String(height));
     });
   }
-
 
   /**
    * Calculate the bounds of the entire tree
