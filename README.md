@@ -8,28 +8,43 @@ A lightweight, customizable tree visualization library for the web. SVGTreeViewe
 
 - **Interactive Tree Visualization**: Display hierarchical data in a tree structure
 - **Multiple Root Nodes**: Support for forests (multiple root nodes)
-- **Pan & Zoom**: Smooth panning and zooming of the canvas
-- **Node Manipulation**: Drag & drop nodes to customize your tree layout
-- **Collapsible Nodes**: Expand/collapse nodes with children
-- **Customizable Appearance**: Easily style nodes with custom templates
-- **Background Patterns**: Built-in dot and grid patterns for the canvas
-- **Interactive Controls**: Zoom, reset, and center buttons
-- **Modern S-curved Connectors**: Beautiful connections between nodes
+- **Pan & Zoom**: 
+  - Smooth panning with mouse drag
+  - Mouse wheel zooming
+  - Zoom in/out buttons
+  - Zoom to fit functionality
+- **Node Manipulation**: 
+  - Drag & drop nodes to customize layout
+  - Save and restore node positions
+  - Reset to default layout
+  - Export/Import node positions
+- **Collapsible Nodes**: 
+  - Expand/collapse nodes with children
+  - Visual indicators for collapsed/expanded state
+  - Double-click to toggle
+- **Customizable Appearance**: 
+  - HTML templates for nodes
+  - Custom styling support
+  - Dynamic data insertion
+- **Background Options**:
+  - Dot pattern
+  - Grid pattern
+  - Solid color
+  - Custom colors
+- **Interactive Controls**: 
+  - Zoom controls
+  - Reset view
+  - Center tree
+  - Reset layout
+- **Modern Connectors**: 
+  - S-curved lines
+  - Dashed or solid lines
+  - Automatic path updates
 
 ## Installation
 
-### NPM
-```bash
-npm install svg-tree-viewer
-```
-
-### CDN
-```html
-<script src="https://cdn.jsdelivr.net/npm/svg-tree-viewer@latest/dist/browser/bundle.js"></script>
-```
-
 ### Self-hosted
-Download the latest release from the GitHub repository and include it in your project:
+Download the latest release and include it in your project:
 ```html
 <script src="dist/browser/bundle.js"></script>
 ```
@@ -46,7 +61,7 @@ Download the latest release from the GitHub repository and include it in your pr
     <style>
         #tree-container {
             width: 80%;
-            height: 80%;
+            height: 80vh;
             border-radius: 20px;
             border: 1px solid grey;
             overflow: hidden;
@@ -61,26 +76,16 @@ Download the latest release from the GitHub repository and include it in your pr
     
     <script src="dist/browser/bundle.js"></script>
     <script>
-        // Sample data
         const treeData = [
-            { ID: 1, parent_id: null, data: { title: "Root", src: "#" } },
-            { ID: 2, parent_id: 1, data: { name: "Gean", title: "Child 1", src: "#" } },
-            { ID: 3, parent_id: 1, data: { title: "Child 2", src: "#" } },
-            { ID: 4, parent_id: 3, data: { title: "Child 3", src: "#" } },
-            { ID: 5, parent_id: 3, data: { title: "Child 4", src: "#" } },
-            { ID: 6, parent_id: 2, data: { title: "Child 5", src: "#" } },
-            { ID: 7, parent_id: null, data: { title: "Root 2", src: "#", job: "Suppreme boss" } },
-            { ID: 8, parent_id: 7, data: { title: "Child 1'", job: "CEO" } },
-            { ID: 9, parent_id: 8, data: { title: "Child 2'", job: "CFO"} },
+            { id: 1, parent_id: null, data: { title: "Root", description: "Root node" } },
+            { id: 2, parent_id: 1, data: { title: "Child 1", description: "First child" } }
         ];
         
-        // Initialize the tree viewer
-        document.addEventListener('DOMContentLoaded', function() {
-            const treeViewer = new SVGTreeViewer({
-                containerId: 'tree-container',
-                data: treeData,
-                collapseChild: true
-            });
+        const viewer = new SVGTreeViewer({
+            containerId: 'tree-container',
+            data: treeData,
+            template: '<div><h3>[data:title]</h3><p>[data:description]</p></div>',
+            collapseChild: true
         });
     </script>
 </body>
@@ -91,102 +96,96 @@ Download the latest release from the GitHub repository and include it in your pr
 
 ### Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `containerId` | string | (required) | ID of the container element |
-| `data` | Array | `[]` | Array of tree node data objects |
-| `idAlias` | string | `"id"` | Property name to use as node ID |
-| `parentIdAlias` | string | `"parent_id"` | Property name to use as parent ID |
-| `collapseChild` | boolean | `false` | Whether to show collapse/expand buttons |
-| `template` | string | `"<div class='node'>[data:text]</div>"` | HTML template for node content |
-| `nodeWidth` | number | `160` | Width of each node in pixels |
-| `nodeHeight` | number | `100` | Height of each node in pixels |
-| `nodePadding` | number | `40` | Padding between sibling nodes |
-| `levelHeight` | number | `150` | Vertical spacing between tree levels |
-| `horizontalSpacing` | number | `200` | Horizontal spacing between nodes |
-| `backgroundPattern` | string | `"dots"` | Background pattern (`"dots"`, `"grid"`, or `"none"`) |
-| `backgroundColor` | string | `"#f9f9f9"` | Background color |
-| `patternColor` | string | `"#cccccc"` | Color of the background pattern |
-
-### Data Format
-
-SVGTreeViewer uses a flat array of objects with parent-child relationships:
-
-```javascript
-[
-  { id: 1, parent_id: null, data: { text: "Root Node" } },
-  { id: 2, parent_id: 1, data: { text: "Child Node" } }
-]
-```
-
-Each object can contain any additional properties that can be referenced in the node template using `[data:propertyName]`.
-
-So, for this example, it will be `[data:text]` in the template:
-
-```javascript
-var template = `<div>[data:text]</div>`;
-
-const treeViewer = new SVGTreeViewer({
-                                        ...
-                                        template: template,
-                                    });
-```
+| Option | Type | Default | Possible Values | Description |
+|--------|------|---------|----------------|-------------|
+| `containerId` | string | (required) | Any valid DOM ID | Container element ID |
+| `data` | Array | `[]` | Array of objects | Tree node data array |
+| `idAlias` | string | `"id"` | Any string | Node ID property name |
+| `parentIdAlias` | string | `"parent_id"` | Any string | Parent ID property name |
+| `collapseChild` | boolean | `false` | `true`, `false` | Show collapse buttons |
+| `template` | string | `"<div>[data:text]</div>"` | Any valid HTML | Node template with data markers |
+| `nodeWidth` | number | `160` | > 0 | Node width in pixels |
+| `nodeHeight` | number | `100` | > 0 | Node height in pixels |
+| `nodePadding` | number | `40` | ≥ 0 | Sibling node padding |
+| `levelHeight` | number | `150` | > 0 | Vertical level spacing |
+| `horizontalSpacing` | number | `200` | > 0 | Horizontal node spacing |
+| `backgroundPattern` | string | `"dots"` | `"dots"`, `"grid"`, `"none"` | Background pattern type |
+| `backgroundColor` | string | `"#f9f9f9"` | Any valid color | Background color |
+| `patternColor` | string | `"#cccccc"` | Any valid color | Pattern color |
 
 ### Methods
 
-| Method | Description |
-|--------|-------------|
-| `updateData(data)` | Update the tree with new data |
-| `resetView()` | Reset the view to initial state |
-| `resetNodePositions()` | Reset all nodes to their calculated positions |
-| `toggleNodeCollapse(id)` | Expand or collapse a specific node by ID |
-| `centerTree()` | Center the tree in the viewport |
-| `zoomToFit()` | Zoom to fit all nodes in the view |
+| Method | Parameters | Return | Description |
+|--------|------------|--------|-------------|
+| `updateData(data)` | `Array` | void | Update tree data |
+| `resetView()` | none | void | Reset view state |
+| `resetNodePositions()` | none | void | Reset node positions |
+| `toggleNodeCollapse(id)` | `string\|number` | void | Toggle node collapse |
+| `centerTree()` | none | void | Center the tree |
+| `zoomToFit()` | none | void | Fit tree to view |
+| `exportPositions()` | none | `string` | Export node positions |
+| `importPositions(json)` | `string` | void | Import node positions |
 
-## Advanced Usage
-
-### Custom Node Templates
-
-Customize the appearance of nodes using HTML templates:
+### Position Management
 
 ```javascript
-const treeViewer = new SVGTreeViewer({
+// Export current layout
+const positions = viewer.exportPositions();
+localStorage.setItem('treeLayout', positions);
+
+// Import saved layout
+const savedLayout = localStorage.getItem('treeLayout');
+if (savedLayout) {
+    viewer.importPositions(savedLayout);
+}
+```
+
+### Custom Templates
+
+```javascript
+const viewer = new SVGTreeViewer({
     containerId: 'tree-container',
-    data: treeData,
     template: `
-        <div style="text-align:center">
-            <strong>[data:text]</strong><br>
-            <small>ID: [data:id]</small>
+        <div class="node">
+            <h3>[data:title]</h3>
+            <p>[data:description]</p>
+            <small>[data:role]</small>
         </div>
-    `
+    `,
+    // ... other options
 });
 ```
 
-### Custom Background Patterns
+### Data Structure
 
-Choose from different background patterns:
-
-```javascript
-const treeViewer = new SVGTreeViewer({
-    containerId: 'tree-container',
-    data: treeData,
-    backgroundPattern: 'grid',       // 'dots', 'grid', or 'none'
-    backgroundColor: '#f0f0f0',
-    patternColor: '#dddddd'
-});
+```typescript
+interface TreeNodeData {
+    id: string | number;
+    parent_id: string | number | null;
+    data: {
+        [key: string]: any;  // Custom data properties
+    };
+}
 ```
 
-## Events
+## Interactions
 
-SVGTreeViewer provides various mouse interactions:
-- **Pan**: Click and drag on the canvas
-- **Zoom**: Scroll wheel on the canvas
-- **Drag Nodes**: Click and drag on a node
-- **Collapse/Expand**: Double-click on a node with children or use the collapse/expand button
+- **Pan Canvas**: Click and drag on empty space
+- **Zoom**: 
+  - Mouse wheel up/down
+  - Zoom buttons
+  - Double-click nodes
+- **Node Operations**:
+  - Drag: Click and hold node
+  - Collapse: Click collapse button or double-click
+  - Select: Click node
+- **View Controls**:
+  - Reset: Reset button
+  - Center: Center button
+  - Fit: Fit to view button
 
 ## Browser Support
 
-SVGTreeViewer works in all modern browsers that support SVG and ES6:
 - Chrome (latest)
 - Firefox (latest)
 - Safari (latest)
@@ -198,15 +197,10 @@ MIT License
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions welcome! Please:
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
 5. Open a Pull Request
-
-## Acknowledgments
-
-- Inspired by various tree visualization libraries
-- SVG manipulation based on modern web standards
