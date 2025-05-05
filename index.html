@@ -21,20 +21,37 @@
             }
 
             .node {
-                font-family: sans-serif;
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
                 font-size: 14px;
                 background: white;
                 border-radius: 6px;
                 padding: 10px;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
                 width: auto;
                 height: 100%;
                 text-align: center;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
             }
 
             .node h4 {
                 margin: 0;
                 font-size: 16px;
+                color: #5a340a;
+            }
+
+            .node small {
+                color: #6c757d;
+                font-size: 12px;
+                margin-bottom: 10px;
+            }
+
+            .node a {
+                text-decoration: none;
+                color: #906508;
+                font-size: 14px;
             }
 
             .collapse-btn {
@@ -86,36 +103,20 @@
         <script type="module">
             const data = [
                 { cur_id: 1, user_id: null, data: { title: "Root", src: "#" } },
-                {
-                    cur_id: 2,
-                    user_id: 1,
-                    data: { name: "Gean", title: "Child 1", src: "#" },
-                },
+                { cur_id: 2, user_id: 1, data: { name: "Gean", title: "Child 1", src: "#" } },
                 { cur_id: 3, user_id: 1, data: { title: "Child 2", src: "#" } },
-                { cur_id: 4, user_id: 3, data: { title: "Child 3", src: "#" } },
-                { cur_id: 5, user_id: 3, data: { title: "Child 4", src: "#" } },
-                { cur_id: 6, user_id: 2, data: { title: "Child 5", src: "#" } },
-                {
-                    cur_id: 7,
-                    user_id: null,
-                    data: { title: "Root 2", src: "#", job: "Suppreme boss" },
-                },
-                {
-                    cur_id: 8,
-                    user_id: 7,
-                    data: { title: "Child 1'", job: "CEO" },
-                },
-                {
-                    cur_id: 9,
-                    user_id: 8,
-                    data: { title: "Child 2'", job: "CFO" },
-                },
+                { cur_id: 4, user_id: 3, data: { title: "Grand Child 3", src: "#" } },
+                { cur_id: 5, user_id: 3, data: { title: "Grand Child 4", src: "#" } },
+                { cur_id: 6, user_id: 2, data: { title: "Grand Child 5", src: "#" } },
+                { cur_id: 7, user_id: null, data: { title: "Root 2", src: "#", job: "Suppreme boss" } },
+                { cur_id: 8, user_id: 7, data: { title: "Child 1'", job: "CEO" } },
+                { cur_id: 9, user_id: 8, data: { title: "Grand Child 2'", job: "CFO" } },
             ];
 
             const template = `
         <div class="node">
           <h4 style="margin-bottom:5px;">[data:name] [data:title]</h4>
-          <small style='display:block; margin-bottom:15px; color: grey'>[data:job]</small>
+          <small>[data:job]</small>
           <a href="[data:src]">View</a>
         </div>
         `;
@@ -128,9 +129,10 @@
                 collapseChild: true,
                 template: template,
                 nodeWidth: 240,
-                nodeHeight: 150,
+                nodeHeight: 160,
                 levelHeight: 200,
                 horizontalSpacing: 320,
+                backgroundPattern: "grid"
             });
         </script>
     </body>
