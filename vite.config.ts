@@ -6,7 +6,7 @@ export default defineConfig({
     rollupOptions: {
       input: "src/index.ts", // adjust if your entry point is different
       output: {
-        entryFileNames: "bundle.js",
+        entryFileNames: "svgtreeviewer.js",
         format: "iife", // or 'es', 'cjs' depending on your use case
       },
     },
